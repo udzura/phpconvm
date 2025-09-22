@@ -164,6 +164,9 @@ class Instance {
 
     public function importSection() {
         foreach ($this->sections as $section) {
+            if (!is_object($section)) {
+                throw new LoadError("Invalid section object");
+            }
             if ($section->code === WasmConst::SectionImport) {
                 return $section;
             }
@@ -173,6 +176,9 @@ class Instance {
 
     public function typeSection() {
         foreach ($this->sections as $section) {
+            if (!is_object($section)) {
+                throw new LoadError("Invalid section object");
+            }
             if ($section->code === WasmConst::SectionType) {
                 return $section;
             }
@@ -182,6 +188,9 @@ class Instance {
 
     public function memorySection() {
         foreach ($this->sections as $section) {
+            if (!is_object($section)) {
+                throw new LoadError("Invalid section object");
+            }
             if ($section->code === WasmConst::SectionMemory) {
                 return $section;
             }
@@ -191,6 +200,9 @@ class Instance {
 
     public function dataSection() {
         foreach ($this->sections as $section) {
+            if (!is_object($section)) {
+                throw new LoadError("Invalid section object");
+            }
             if ($section->code === WasmConst::SectionData) {
                 return $section;
             }
@@ -200,6 +212,9 @@ class Instance {
 
     public function functionSection() {
         foreach ($this->sections as $section) {
+            if (!is_object($section)) {
+                throw new LoadError("Invalid section object");
+            }
             if ($section->code === WasmConst::SectionFunction) {
                 return $section;
             }
@@ -209,6 +224,9 @@ class Instance {
 
     public function codeSection() {
         foreach ($this->sections as $section) {
+            if (!is_object($section)) {
+                throw new LoadError("Invalid section object");
+            }
             if ($section->code === WasmConst::SectionCode) {
                 return $section;
             }
@@ -218,6 +236,9 @@ class Instance {
 
     public function exportSection() {
         foreach ($this->sections as $section) {
+            if (!is_object($section)) {
+                throw new LoadError("Invalid section object");
+            }
             if ($section->code === WasmConst::SectionExport) {
                 return $section;
             }
