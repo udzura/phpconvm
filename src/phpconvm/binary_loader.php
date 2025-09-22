@@ -100,12 +100,21 @@ class BinaryLoader {
         return $sections;
     }
 
+    // バイナリデータからメモリストリームを作成するヘルパー関数
+    private static function createMemoryStream($data) {
+        $stream = fopen('php://memory', 'r+b');
+        fwrite($stream, $data);
+        rewind($stream);
+        return $stream;
+    }
+
     private static function typeSection() {
         $dest = new TypeSection();
         $size = (new self())->fetchUleb128(self::$buf);
         $dest->size = $size;
         
-        $sbuf = fopen('data://text/plain,' . fread(self::$buf, $size), 'rb');
+        $data = fread(self::$buf, $size);
+        $sbuf = self::createMemoryStream($data);
 
         $len = (new self())->fetchUleb128($sbuf);
         for ($i = 0; $i < $len; $i++) {
@@ -149,7 +158,9 @@ class BinaryLoader {
         $dest = new ImportSection();
         $size = (new self())->fetchUleb128(self::$buf);
         $dest->size = $size;
-        $sbuf = fopen('data://text/plain,' . fread(self::$buf, $size), 'rb');
+        
+        $data = fread(self::$buf, $size);
+        $sbuf = self::createMemoryStream($data);
 
         $len = (new self())->fetchUleb128($sbuf);
         for ($i = 0; $i < $len; $i++) {
@@ -177,7 +188,9 @@ class BinaryLoader {
         $dest = new MemorySection();
         $size = (new self())->fetchUleb128(self::$buf);
         $dest->size = $size;
-        $sbuf = fopen('data://text/plain,' . fread(self::$buf, $size), 'rb');
+        
+        $data = fread(self::$buf, $size);
+        $sbuf = self::createMemoryStream($data);
 
         $len = (new self())->fetchUleb128($sbuf);
         if ($len !== 1) {
@@ -202,7 +215,9 @@ class BinaryLoader {
         $dest = new FunctionSection();
         $size = (new self())->fetchUleb128(self::$buf);
         $dest->size = $size;
-        $sbuf = fopen('data://text/plain,' . fread(self::$buf, $size), 'rb');
+        
+        $data = fread(self::$buf, $size);
+        $sbuf = self::createMemoryStream($data);
 
         $len = (new self())->fetchUleb128($sbuf);
         for ($i = 0; $i < $len; $i++) {
@@ -218,7 +233,9 @@ class BinaryLoader {
         $dest = new CodeSection();
         $size = (new self())->fetchUleb128(self::$buf);
         $dest->size = $size;
-        $sbuf = fopen('data://text/plain,' . fread(self::$buf, $size), 'rb');
+        
+        $data = fread(self::$buf, $size);
+        $sbuf = self::createMemoryStream($data);
 
         $len = (new self())->fetchUleb128($sbuf);
         for ($i = 0; $i < $len; $i++) {
@@ -229,7 +246,7 @@ class BinaryLoader {
                 error_log("warning: instruction not ended with inst end(0x0b): 0x" . dechex(ord($last_code)));
             }
             
-            $cbuf = fopen('data://text/plain,' . $code, 'rb');
+            $cbuf = self::createMemoryStream($code);
             $locals_count = [];
             $locals_type = [];
             $locals_len = (new self())->fetchUleb128($cbuf);
@@ -294,13 +311,15 @@ class BinaryLoader {
         $dest = new DataSection();
         $size = (new self())->fetchUleb128(self::$buf);
         $dest->size = $size;
-        $sbuf = fopen('data://text/plain,' . fread(self::$buf, $size), 'rb');
+        
+        $data = fread(self::$buf, $size);
+        $sbuf = self::createMemoryStream($data);
 
         $len = (new self())->fetchUleb128($sbuf);
         for ($i = 0; $i < $len; $i++) {
             $mem_index = (new self())->fetchUleb128($sbuf);
             $code = self::fetchInsnWhileEnd($sbuf);
-            $ops = self::codeBody(fopen('data://text/plain,' . $code, 'rb'));
+            $ops = self::codeBody(self::createMemoryStream($code));
             $offset = self::decodeExpr($ops);
 
             $len = (new self())->fetchUleb128($sbuf);
@@ -354,7 +373,9 @@ class BinaryLoader {
         $dest = new ExportSection();
         $size = (new self())->fetchUleb128(self::$buf);
         $dest->size = $size;
-        $sbuf = fopen('data://text/plain,' . fread(self::$buf, $size), 'rb');
+        
+        $data = fread(self::$buf, $size);
+        $sbuf = self::createMemoryStream($data);
 
         $len = (new self())->fetchUleb128($sbuf);
         for ($i = 0; $i < $len; $i++) {
