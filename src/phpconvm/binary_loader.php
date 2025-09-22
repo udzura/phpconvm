@@ -312,26 +312,26 @@ class BinaryLoader {
         $size = (new self())->fetchUleb128(self::$buf);
         $dest->size = $size;
         
-        $data = fread(self::$buf, $size);
-        $sbuf = self::createMemoryStream($data);
+        $section_data = fread(self::$buf, $size);
+        $sbuf = self::createMemoryStream($section_data);
 
-        $len = (new self())->fetchUleb128($sbuf);
-        for ($i = 0; $i < $len; $i++) {
+        $segment_count = (new self())->fetchUleb128($sbuf);
+        for ($i = 0; $i < $segment_count; $i++) {
             $mem_index = (new self())->fetchUleb128($sbuf);
             $code = self::fetchInsnWhileEnd($sbuf);
             $ops = self::codeBody(self::createMemoryStream($code));
             $offset = self::decodeExpr($ops);
 
-            $len = (new self())->fetchUleb128($sbuf);
-            $data = fread($sbuf, $len);
-            if (!$data) {
+            $data_length = (new self())->fetchUleb128($sbuf);
+            $segment_data = fread($sbuf, $data_length);
+            if (!$segment_data) {
                 throw new LoadError("buffer too short");
             }
 
-            $segment = new Segment(function($seg) use ($mem_index, $offset, $data) {
+            $segment = new Segment(function($seg) use ($mem_index, $offset, $segment_data) {
                 $seg->flags = $mem_index;
                 $seg->offset = $offset;
-                $seg->data = $data;
+                $seg->data = $segment_data;
             });
             $dest->segments[] = $segment;
         }

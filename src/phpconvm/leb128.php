@@ -5,7 +5,7 @@ trait Leb128Helpers {
         $dest = 0;
         $level = 0;
         
-        while (($b = fread($buf, 1)) !== '') {
+        while (($b = fread($buf, 1)) !== false && $b !== '') {
             $c = ord($b);
             
             $upper = ($c >> 7);
@@ -17,19 +17,19 @@ trait Leb128Helpers {
             }
             
             if ($level > 6) {
-                break;
+                throw new LoadError("LEB128 too long: dest = $dest level = $level");
             }
             $level++;
         }
-        
-        throw new LoadError("unreachable! debug: dest = $dest level = $level");
+
+        throw new LoadError("fetchUleb128: buffer too short during LEB128 decode: dest = $dest level = $level");
     }
 
     public function fetchSleb128($buf) {
         $dest = 0;
         $level = 0;
-        
-        while (($b = fread($buf, 1)) !== '') {
+
+        while (($b = fread($buf, 1)) !== false && $b !== '') {
             $c = ord($b);
             
             $upper = ($c >> 7);
@@ -41,12 +41,14 @@ trait Leb128Helpers {
             }
             
             if ($level > 6) {
-                throw new LoadError("unreachable! debug: dest = $dest level = $level");
+                throw new LoadError("fetchSleb128: LEB128 too long: dest = $dest level = $level");
             }
             $level++;
         }
         
+        // Ruby版の符号拡張ロジックを正確に実装
         $shift = 7 * ($level + 1) - 1;
-        return $dest | -($dest & (1 << $shift));
+        $result = $dest | -($dest & (1 << $shift));
+        return $result;
     }
 }
