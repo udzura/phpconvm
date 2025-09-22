@@ -7,14 +7,11 @@ class VM {
     public $hoge;
 
     public function __construct($wasm_path = null) {
-        echo "VM initialized.\n";
+        echo "[debug] VM initialized.\n";
         
         if ($wasm_path) {
             $this->instance = PhpConVm::new($wasm_path);
         }
-        
-        $this->hoge = "default\n";
-        echo $this->hoge;
     }
 
     public function loadWasm($path) {
