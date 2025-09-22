@@ -3,8 +3,7 @@
 require_once 'phpconvm.php';
 
 class VM {
-    private $instance;
-    public $hoge;
+    public $instance;
 
     public function __construct($wasm_path = null) {
         echo "[debug] VM initialized.\n";
